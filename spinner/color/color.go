@@ -25,6 +25,14 @@ func (rgb *RGBColor) ANSI() string {
 	return fmt.Sprintf("\033[38;2;%d;%d;%dm", rgb.R, rgb.G, rgb.B)
 }
 
+func NewColor(r, g, b int) (Color, error) {
+	color, err := NewRGBColor(r, g, b)
+	if err != nil {
+		return nil, err
+	}
+	return color, nil
+}
+
 func Red() Color {
 	red, _ := NewRGBColor(255, 0, 0)
 	return red

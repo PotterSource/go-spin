@@ -1,6 +1,7 @@
 package spinner
 
 import (
+	"errors"
 	"fmt"
 	"github.com/PotterSource/go-spin/spinner/color"
 	"time"
@@ -10,10 +11,9 @@ type Frames []string
 type Type map[string]Frames
 
 type Spinner struct {
-	frames          Frames
-	updateFrequency time.Duration
-	stop            chan bool
-	color           color.Color
+	frames Frames
+	stop   chan bool
+	color  color.Color
 }
 
 var spinnerTypes = Type{
@@ -33,19 +33,18 @@ var spinnerTypes = Type{
 
 func NewSpinner(
 	spinnerType string,
-	updateFrequency time.Duration,
 	rgbColor color.Color,
-) *Spinner {
+) (*Spinner, error) {
 	frames, ok := spinnerTypes[spinnerType]
 	if !ok {
-		return nil
+		return nil, errors.New("invalid spinner type")
 	}
+
 	return &Spinner{
-		frames:          frames,
-		updateFrequency: updateFrequency,
-		stop:            make(chan bool),
-		color:           rgbColor,
-	}
+		frames: frames,
+		stop:   make(chan bool),
+		color:  rgbColor,
+	}, nil
 }
 
 func (s *Spinner) Start() {
@@ -56,17 +55,18 @@ func (s *Spinner) Start() {
 				case <-s.stop:
 					return
 				default:
-					// Ensuring the color is converted to a string properly
 					fmt.Printf("\r%s%s\033[0m", s.color.ANSI(), frame)
-					time.Sleep(s.updateFrequency)
+					time.Sleep(100 * time.Millisecond)
 				}
 			}
 		}
 	}()
 }
 
-func (s *Spinner) Stop() {
+func (s *Spinner) Stop(messages ...string) {
 	s.stop <- true
 	close(s.stop)
-	fmt.Println("\rSpinner stopped.")
+	if len(messages) > 0 {
+		fmt.Println("\r" + messages[0])
+	}
 }

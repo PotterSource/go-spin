@@ -49,9 +49,9 @@ func NewSpinner(
 
 func (s *Spinner) Start(messages ...string) {
 	go func() {
-		message := "" // Default to no message
+		message := ""
 		if len(messages) > 0 {
-			message = " " + messages[0] // Add a space for separation, use only the first message if provided
+			message = " " + messages[0]
 		}
 		for {
 			for _, frame := range s.frames {

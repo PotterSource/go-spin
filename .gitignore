@@ -30,3 +30,6 @@ go.work.sum
 # IDE
 
 .idea/
+
+# main.go - only used for local testing
+main.go

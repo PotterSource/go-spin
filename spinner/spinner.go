@@ -10,10 +10,10 @@ type Frames []string
 type Type map[string]Frames
 
 type Spinner struct {
-	frames Frames
-	delay  time.Duration
-	stop   chan bool
-	color  color.Color
+	frames          Frames
+	updateFrequency time.Duration
+	stop            chan bool
+	color           color.Color
 }
 
 var spinnerTypes = Type{
@@ -33,7 +33,7 @@ var spinnerTypes = Type{
 
 func NewSpinner(
 	spinnerType string,
-	delay time.Duration,
+	updateFrequency time.Duration,
 	rgbColor color.Color,
 ) *Spinner {
 	frames, ok := spinnerTypes[spinnerType]
@@ -41,10 +41,10 @@ func NewSpinner(
 		return nil
 	}
 	return &Spinner{
-		frames: frames,
-		delay:  delay,
-		stop:   make(chan bool),
-		color:  rgbColor,
+		frames:          frames,
+		updateFrequency: updateFrequency,
+		stop:            make(chan bool),
+		color:           rgbColor,
 	}
 }
 
@@ -58,7 +58,7 @@ func (s *Spinner) Start() {
 				default:
 					// Ensuring the color is converted to a string properly
 					fmt.Printf("\r%s%s\033[0m", s.color.ANSI(), frame)
-					time.Sleep(s.delay)
+					time.Sleep(s.updateFrequency)
 				}
 			}
 		}
